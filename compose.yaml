@@ -1,14 +1,38 @@
 services:
-  oracle:
-    image: 'gvenzl/oracle-free:latest'
+  postgres:
+    image: postgres:latest
+    container_name: pizzeria-postgres
     environment:
-      - 'ORACLE_PASSWORD=secret'
+      POSTGRES_USER: pizzeria
+      POSTGRES_PASSWORD: pizzeria
+      POSTGRES_DB: pizzeria
     ports:
-      - '1521'
+      - "5433:5433"
+    networks:
+      - pizzeria-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pizzeria"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
-    image: 'rabbitmq:latest'
-    environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+    image: rabbitmq:3-management
+    container_name: pizzeria-rabbitmq
     ports:
-      - '5672'
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - pizzeria-network
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+networks:
+  pizzeria-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

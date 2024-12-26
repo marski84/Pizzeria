@@ -1,0 +1,4 @@
+spring:
+  profiles:
+    active: dev  # domyślnie używamy profilu dev
+
