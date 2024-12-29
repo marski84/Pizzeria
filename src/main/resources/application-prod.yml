@@ -9,3 +9,9 @@ jpa:
   hibernate:
     ddl-auto: update
   show-sql: true
+
+
+
+scheduler:
+  supply-check:
+    interval: 100000
