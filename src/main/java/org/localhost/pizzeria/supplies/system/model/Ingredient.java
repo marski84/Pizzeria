@@ -4,26 +4,29 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "ingredients")
 public class Ingredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Name is mandatory")
     @Column(unique = true)
-    String productName;
+    private String productName;
 
-    @NotNull(message = "Amount in stock connot be null")
+    @NotNull(message = "Amount in stock cannot be null")
     @Min(value = 0, message = "Amount in stock cannot be negative")
-    Long amountInStock;
+    private Long amountInStock;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Unit type cannot be null")
@@ -54,7 +57,7 @@ public class Ingredient {
     }
 
     public boolean isStockSufficient(int requiredAmount) {
-        return requiredAmount >= minimumRequiredAmount;
+        return amountInStock >= requiredAmount;
     }
 
     public enum UnitType {
