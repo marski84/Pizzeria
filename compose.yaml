@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: pizzeria
       POSTGRES_DB: pizzeria
     ports:
-      - "5433:5433"
+      - "5433:5432"  # Zmiana na standardowy port PostgreSQL
     networks:
       - pizzeria-network
     volumes:
@@ -22,8 +22,8 @@ services:
     image: rabbitmq:3-management
     container_name: pizzeria-rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
     networks:
       - pizzeria-network
     environment:

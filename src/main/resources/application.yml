@@ -1,4 +1,23 @@
 spring:
   profiles:
     active: dev  # domyślnie używamy profilu dev
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+
+rabbitmq:
+    queue:
+      supply-check: supply-check-queue
+    exchange:
+      supply-check: supply-check-exchange
+    routing-key:
+      supply-check: supply-check-routing-key
+
+scheduler:
+    supply-check:
+#      interval: 300000 # 5 minut
+      interval: 100000
 

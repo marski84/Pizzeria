@@ -26,15 +26,16 @@ public class Ingredient {
 
     @NotNull(message = "Amount in stock cannot be null")
     @Min(value = 0, message = "Amount in stock cannot be negative")
-    private Long amountInStock;
+    private int amountInStock;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Unit type cannot be null")
+    @Column(columnDefinition = "varchar(255)")
     private UnitType unitType;
 
     @NotNull(message = "Minimum required amount cannot be null")
     @Min(value = 0, message = "Minimum required amount cannot be negative")
-    private Long minimumRequiredAmount;
+    private int minimumRequiredAmount;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;

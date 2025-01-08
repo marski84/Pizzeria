@@ -1,19 +1,29 @@
 spring:
   datasource:
     url: jdbc:h2:mem:pizzeriadb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: password
+    username: ok
+    password: ok
     driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      platform: postgresql
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+#    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: false
+        trace: false
 
 scheduler:
   supply-check:
-    interval: 300
+    interval: 300000

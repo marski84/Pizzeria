@@ -1,17 +1,26 @@
 spring:
-datasource:
-  url: jdbc:postgresql://127.0.0.1:5433/pizzeria
-  username: pizzeria
-  password: pizzeria
-  driver-class-name: org.postgresql.Driver
-jpa:
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
-  hibernate:
-    ddl-auto: update
-  show-sql: true
-
-
+  datasource:
+    url: jdbc:postgresql://localhost:5433/pizzeria
+    username: pizzeria
+    password: pizzeria
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  docker:
+    compose:
+      enabled: true # jawnie włączamy wsparcie dla docker-compose
 
 scheduler:
   supply-check:
     interval: 100000
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

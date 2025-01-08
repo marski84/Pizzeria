@@ -20,5 +20,5 @@ public class EditIngredientDto {
 
     @NotNull(message = "Minimum required amount cannot be null")
     @Min(value = 0, message = "Minimum required amount cannot be negative")
-    private Long minimumRequiredAmount;
+    private int minimumRequiredAmount;
 }

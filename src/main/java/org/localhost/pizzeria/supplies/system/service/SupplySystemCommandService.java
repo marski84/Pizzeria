@@ -12,7 +12,7 @@ public interface SupplySystemCommandService {
     void decreaseIngredientStock(long ingredientId, int amount);
     void increaseIngredientStock(long ingredientId, int amount);
     IngredientDTO registerNewIngredient(NewIngredientDto ingredientData);
-    EditIngredientDto upgradeIngredientData(long ingredientId, IngredientDTO ingredientData);
+    IngredientDTO updateIngredientData(long ingredientId, EditIngredientDto ingredientData);
     void removeIngredient(long ingredientId);
     List<Ingredient> submitOrderToStockQueue(List<Long> ingredientIds);
 
