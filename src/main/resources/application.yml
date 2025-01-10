@@ -1,23 +1,26 @@
 spring:
   profiles:
-    active: dev  # domyślnie używamy profilu dev
+    active: dev
   rabbitmq:
     host: localhost
     port: 5672
     username: guest
     password: guest
 
-
 rabbitmq:
-    queue:
-      supply-check: supply-check-queue
-    exchange:
-      supply-check: supply-check-exchange
-    routing-key:
-      supply-check: supply-check-routing-key
+  queue:
+    supply-check: supply-check-queue
+    supply-check-dlq: supply-check-dlq
+  exchange:
+    supply-check: supply-check-exchange
+    supply-check-dlq-exchange: supply-check-dlq-exchange
+  routing-key:
+    supply-check: supply-check-routing-key
+    supply-check-dead-letter-routing-queue: supply-check-dead-letter-routing-key
 
 scheduler:
-    supply-check:
-#      interval: 300000 # 5 minut
-      interval: 100000
+  supply-check:
+    interval: 100000
 
+nats:
+  url: "nats://localhost:4222"
