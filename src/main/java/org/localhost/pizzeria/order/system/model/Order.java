@@ -8,7 +8,7 @@ import org.localhost.pizzeria.order.system.OrderStatus;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "customers", schema = "ordering_system")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,8 +30,8 @@ public class Order {
     @NotNull(message = "Order status cannot be null")
     private OrderStatus orderStatus;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
 

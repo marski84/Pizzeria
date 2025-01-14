@@ -16,7 +16,6 @@ rabbitmq:
     supply-check-dlq-exchange: supply-check-dlq-exchange
   routing-key:
     supply-check: supply-check-routing-key
-    supply-check-dead-letter-routing-queue: supply-check-dead-letter-routing-key
 
 scheduler:
   supply-check:
