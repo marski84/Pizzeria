@@ -1,7 +1,7 @@
-INSERT INTO ingredient (product_name, amount_in_stock, minimum_required_amount, unit_type, created_at)
+INSERT INTO ingredients (product_name, amount_in_stock, minimum_required_amount, unit_type, created_at)
 VALUES
     -- Podstawowe składniki do pizzy
-    ('Mąka do pizzy', 100000, 20000, 'GRAMS', CURRENT_TIMESTAMP),
+    ('Mąka do pizzy', 100, 20000, 'GRAMS', CURRENT_TIMESTAMP),
     ('Pomidory krojone', 50000, 10000, 'GRAMS', CURRENT_TIMESTAMP),
     ('Mozzarella', 30000, 5000, 'GRAMS', CURRENT_TIMESTAMP),
     ('Oliwa z oliwek', 5000, 1000, 'MILLILITERS', CURRENT_TIMESTAMP),

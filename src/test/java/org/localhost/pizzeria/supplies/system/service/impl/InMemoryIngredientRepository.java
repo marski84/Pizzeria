@@ -4,6 +4,7 @@ import org.localhost.pizzeria.supplies.system.model.Ingredient;
 import org.localhost.pizzeria.supplies.system.repository.SupplySystemRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,7 +38,7 @@ public class InMemoryIngredientRepository implements SupplySystemRepository {
     }
 
     @Override
-    public Iterable<Ingredient> findAll() {
+    public List<Ingredient> findAll() {
         return ingredients.values().stream().toList();
     }
 
@@ -58,7 +59,7 @@ public class InMemoryIngredientRepository implements SupplySystemRepository {
 
     @Override
     public void delete(Ingredient entity) {
-
+        ingredients.remove(entity.getId());
     }
 
     @Override

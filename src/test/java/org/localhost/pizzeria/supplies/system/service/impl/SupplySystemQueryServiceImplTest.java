@@ -26,15 +26,15 @@ class SupplySystemQueryServiceImplTest {
 
     private Ingredient milk = Ingredient.builder()
             .productName("Milk")
-            .amountInStock(100l)
-            .minimumRequiredAmount(10l)
+            .amountInStock(100)
+            .minimumRequiredAmount(10)
             .unitType(Ingredient.UnitType.LITERS)
             .build();
 
     private Ingredient bread = Ingredient.builder()
             .productName("Bread")
-            .amountInStock(200l)
-            .minimumRequiredAmount(200l)
+            .amountInStock(200)
+            .minimumRequiredAmount(200)
             .unitType(Ingredient.UnitType.PACKAGES)
             .build();
 
@@ -79,24 +79,25 @@ class SupplySystemQueryServiceImplTest {
     }
 
     @Test
-    @DisplayName("getIngredientStockStatus should return list of ingredients with stock amount")
-    void getIngredientStockStatus() {
+    @DisplayName("getIngredientsStockStatus should return list of ingredients with stock amount")
+    void getIngredientsStockStatus() {
 //        given
         ingredientRepository.save(milk);
         ingredientRepository.save(bread);
+        final int AMOUNT_OF_INGREDIENTS_IN_STOCK = 2;
 //        when
-        List<Ingredient> testResult = objectUnderTest.getIngredientStockStatus();
+        List<Ingredient> testResult = objectUnderTest.getIngredientsStockStatus();
 //        then
         assertAll(
-                () -> assertEquals(2, testResult.size())
+                () -> assertEquals(AMOUNT_OF_INGREDIENTS_IN_STOCK, testResult.size())
         );
 
-        List<Ingredient> suppliesToOrderList = objectUnderTest.getIngredientStockStatus().stream()
+        List<Ingredient> suppliesToOrderList = objectUnderTest.getIngredientsStockStatus().stream()
                 .filter(ingredient -> ingredient.getAmountInStock() <= ingredient.getMinimumRequiredAmount())
                 .toList();
 
         System.out.println(suppliesToOrderList.stream().map(Ingredient::getProductName));
-
     }
+
 
 }

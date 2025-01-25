@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: pizzeria
       POSTGRES_DB: pizzeria
     ports:
-      - "5433:5433"
+      - "5433:5432"  # Zmiana na standardowy port PostgreSQL
     networks:
       - pizzeria-network
     volumes:
@@ -20,15 +20,42 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     container_name: pizzeria-rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
     networks:
       - pizzeria-network
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nats:
+    image: nats:2.10-alpine  # używamy konkretnej wersji
+    container_name: pizzeria-nats
+    restart: unless-stopped
+    ports:
+      - "4222:4222"     # Client connections
+      - "6222:6222"     # Clustering
+      - "8222:8222"     # HTTP Management
+    command:
+      - "-js"           # Włączamy JetStream
+      - "-m"           # Włączamy monitoring
+      - "8222"         # Port monitoringu
+    networks:
+      - pizzeria-network
+    healthcheck:
+      test: ["CMD", "/nats-server", "--help"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   pizzeria-network:
@@ -36,3 +63,4 @@ networks:
 
 volumes:
   postgres_data:
+  rabbitmq_data:

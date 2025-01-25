@@ -23,7 +23,7 @@ public class NewIngredientDto {
 
     @NotNull(message = "Amount in stock cannot be null")
     @Min(value = 0, message = "Amount in stock cannot be negative")
-    private Long amountInStock;
+    private int amountInStock;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Unit type cannot be null")
@@ -31,5 +31,5 @@ public class NewIngredientDto {
 
     @NotNull(message = "Minimum required amount cannot be null")
     @Min(value = 0, message = "Minimum required amount cannot be negative")
-    private Long minimumRequiredAmount;
+    private int minimumRequiredAmount;
 }
