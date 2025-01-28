@@ -6,7 +6,7 @@ import org.localhost.pizzeria.supplies.system.model.Ingredient;
 import java.util.List;
 
 public interface SupplySystemQueryService {
-    Ingredient isIngredientInStock (Ingredient ingredient);
+    boolean isIngredientInStock(long ingredientId, long quantity);
     List<Ingredient> getIngredientsStockStatus();
 
 //    queue method

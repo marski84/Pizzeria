@@ -8,11 +8,13 @@ import org.localhost.pizzeria.supplies.system.exceptions.messages.IngredientExce
 import org.localhost.pizzeria.supplies.system.model.Ingredient;
 import org.localhost.pizzeria.supplies.system.repository.SupplySystemRepository;
 import org.localhost.pizzeria.supplies.system.service.SupplySystemCommandService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 
+@Service
 public class SupplySystemCommandServiceImpl implements SupplySystemCommandService {
     private final SupplySystemRepository supplySystemRepository;
 

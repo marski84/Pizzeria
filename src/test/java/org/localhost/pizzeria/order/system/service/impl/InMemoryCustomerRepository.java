@@ -18,17 +18,27 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> findByPhone(String phone) {
+    public Optional<Customer> findByPhoneNumber(String phone) {
         return customers.values().stream().filter(customer -> customer.getPhoneNumber().equals(phone)).findFirst();
     }
 
 
     @Override
-    public Optional<Customer> findByEmailOrPhone(String email, String phone) {
+    public Optional<Customer> findByEmailOrPhoneNumber(String email, String phone) {
         return customers.values().stream().filter(
                         customer -> customer.getEmail().equals(email)
                                 || customer.getPhoneNumber().equals(phone))
                 .findFirst();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return customers.values().stream().anyMatch(customer -> customer.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByPhoneNumber(String phone) {
+        return customers.values().stream().anyMatch(customer -> customer.getPhoneNumber().equals(phone));
     }
 
     @Override

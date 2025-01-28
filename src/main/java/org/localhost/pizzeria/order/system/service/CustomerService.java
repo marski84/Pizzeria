@@ -13,6 +13,7 @@ public interface CustomerService {
     Customer registerNewCustomer(NewCustomerDto customer);
     long deleteCustomer(long customerId);
     Customer updateCustomerData(UpdateCustomerDataDto updateCustomerDataDto);
+    void updateCustomerOrder(long customerId, Order order);
     List<Order> getOrdersByCustomerId(long customerId);
     List<Order> getOrdersByCustomerEmail(String customerEmail);
     List<Order> getOrdersByCustomerPhoneNumber(String customerPhone);

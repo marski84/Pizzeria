@@ -9,13 +9,14 @@ import org.localhost.pizzeria.supplies.system.dto.NewIngredientDto;
 import org.localhost.pizzeria.supplies.system.exceptions.IngredientNotFoundException;
 import org.localhost.pizzeria.supplies.system.exceptions.messages.IngredientExceptionsDetails;
 import org.localhost.pizzeria.supplies.system.model.Ingredient;
+import org.localhost.pizzeria.supplies.system.service.SupplySystemCommandService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 class SupplySystemCommandServiceImplTest {
 
-    private SupplySystemCommandServiceImpl objectUnderTest;
+    private SupplySystemCommandService objectUnderTest;
     private InMemoryIngredientRepository ingredientRepository;
     private final long NON_EXISTING_INGREDIENT_ID = 1000;
 

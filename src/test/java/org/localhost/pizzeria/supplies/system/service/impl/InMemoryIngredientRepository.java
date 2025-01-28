@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class InMemoryIngredientRepository implements SupplySystemRepository {
     Map<Long, Ingredient> ingredients = new HashMap<>();
@@ -24,7 +26,9 @@ public class InMemoryIngredientRepository implements SupplySystemRepository {
 
     @Override
     public <S extends Ingredient> Iterable<S> saveAll(Iterable<S> entities) {
-        return null;
+        return StreamSupport.stream(entities.spliterator(), false)
+                .map(entity -> (S) save(entity))
+                .collect(Collectors.toList());
     }
 
     @Override

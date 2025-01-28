@@ -40,29 +40,38 @@ class SupplySystemQueryServiceImplTest {
 
 
     @Test
-    @DisplayName("isIngredientInStock should return Ingredient if it is in stock")
+    @DisplayName("isIngredientInStock should return true if requested quantity of ingredient < amount in stock")
     void isIngredientInStock() {
 //        given
-        ingredientRepository.save(milk);
+        long TEST_INGREDIENT_AMOUNT = 2;
+        Ingredient testIngredient = ingredientRepository.save(milk);
 //        when
-        Ingredient testResult = objectUnderTest.isIngredientInStock(milk);
-        System.out.println(testResult.getProductName());
+        boolean testResult = objectUnderTest.isIngredientInStock(testIngredient.getId(), TEST_INGREDIENT_AMOUNT);
 //        then
-        assertAll(
-                () -> assertEquals(milk.getProductName(), testResult.getProductName()),
-                () -> assertEquals(milk.getAmountInStock(), testResult.getAmountInStock()),
-                () -> assertEquals(milk.getMinimumRequiredAmount(), testResult.getMinimumRequiredAmount()),
-                () -> assertEquals(milk.getUnitType(), testResult.getUnitType())
-        );
+        assertTrue(testResult);
+    }
+
+    @Test
+    @DisplayName("isIngredientInStock should return false if requested quantity of ingredient > amount in stock")
+    void isIngredientInStockShouldReturnFalse() {
+//        given
+        long TEST_INGREDIENT_AMOUNT = 200;
+        Ingredient testIngredient = ingredientRepository.save(milk);
+//        when
+        boolean testResult = objectUnderTest.isIngredientInStock(testIngredient.getId(), TEST_INGREDIENT_AMOUNT);
+//        then
+        assertFalse(testResult);
     }
 
     @Test
     @DisplayName("isIngredientInStock should throw when ingredient not found")
     void isIngredientInStockWhenIngredientNotFound() {
+        long TEST_INGREDIENT_AMOUNT = 2;
+        long NON_EXISTING_INGREDIENT_ID = 100;
 //        when, then
         IngredientNotFoundException testResult = assertThrows(
                 IngredientNotFoundException.class,
-                () -> objectUnderTest.isIngredientInStock(milk));
+                () -> objectUnderTest.isIngredientInStock(NON_EXISTING_INGREDIENT_ID, TEST_INGREDIENT_AMOUNT));
 
         assertAll(
                 () -> assertEquals(

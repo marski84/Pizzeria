@@ -1,5 +1,6 @@
 package org.localhost.pizzeria.order.system.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.localhost.pizzeria.order.system.dto.NewCustomerDto;
 import org.localhost.pizzeria.order.system.dto.UpdateCustomerDataDto;
 import org.localhost.pizzeria.order.system.exceptions.CustomerEmailNotUniqueException;
@@ -10,12 +11,15 @@ import org.localhost.pizzeria.order.system.model.Customer;
 import org.localhost.pizzeria.order.system.model.Order;
 import org.localhost.pizzeria.order.system.repository.CustomerRepository;
 import org.localhost.pizzeria.order.system.service.CustomerService;
+import org.localhost.pizzeria.utils.ValidationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
@@ -25,6 +29,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer findCustomerByEmail(String email) {
+        ValidationUtils.validateNotNull(email, "email");
         if (email == null) {
             throw new IllegalArgumentException("Email cannot be null");
         }
@@ -33,21 +38,21 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer findCustomerByPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) {
-            throw new IllegalArgumentException("Phone number cannot be null");
-        }
-        return customerRepository.findByPhone(phoneNumber).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+        ValidationUtils.validateNotNull(phoneNumber, "phoneNumber");
+        Objects.requireNonNull(phoneNumber, "Phone number cannot be null");
+        return customerRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer registerNewCustomer(NewCustomerDto customer) {
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer data must not be null");
-        }
-        customerRepository.findByEmailOrPhone(customer.getEmail(), customer.getPhoneNumber()).ifPresent(foundCustomer -> validateCustomerData(foundCustomer, customer));
+        ValidationUtils.validateNotNull(customer, "customer");
+
+        customerRepository.findByEmailOrPhoneNumber(customer.getEmail(), customer.getPhoneNumber()).ifPresent(foundCustomer -> validateCustomerUniqueness(foundCustomer, customer));
 
         Customer newCustomer = Customer.fromNewCustomerDto(customer);
+        log.info("New customer registered with id: {}", newCustomer.getId());
+
         return customerRepository.save(newCustomer);
     }
 
@@ -62,30 +67,25 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer updateCustomerData(UpdateCustomerDataDto updateCustomerDataDto) {
-        if (updateCustomerDataDto == null) {
-            throw new IllegalArgumentException("Email cannot be null");
-        }
-        Customer customer = customerRepository.findById(updateCustomerDataDto.getId())
-                .orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+        ValidationUtils.validateNotNull(updateCustomerDataDto, "updateCustomerDataDto");
 
-        if (updateCustomerDataDto.getPhoneNumber() != null
-                && !updateCustomerDataDto.getPhoneNumber().isEmpty()
-                && !updateCustomerDataDto.getPhoneNumber().equals(customer.getPhoneNumber())
-        ) {
+        Customer customer = customerRepository.findById(updateCustomerDataDto.getId()).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+
+        if (!updateCustomerDataDto.getPhoneNumber().equals(customer.getPhoneNumber())) {
+            if (customerRepository.existsByPhoneNumber(updateCustomerDataDto.getPhoneNumber())) {
+                throw new CustomerPhoneNumberNotUniqueException(OrderExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE);
+            }
             customer.setPhoneNumber(updateCustomerDataDto.getPhoneNumber());
         }
 
-        if (updateCustomerDataDto.getEmail() != null
-                && !updateCustomerDataDto.getEmail().isEmpty()
-                && !updateCustomerDataDto.getEmail().equals(customer.getEmail())
-        ) {
+        if (!updateCustomerDataDto.getEmail().equals(customer.getEmail())) {
+            if (customerRepository.existsByEmail(updateCustomerDataDto.getEmail())) {
+                throw new CustomerEmailNotUniqueException(OrderExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE);
+            }
             customer.setEmail(updateCustomerDataDto.getEmail());
         }
 
-        if (updateCustomerDataDto.getAddress() != null
-                && !updateCustomerDataDto.getAddress().isEmpty()
-                && !updateCustomerDataDto.getAddress().equals(customer.getAddress())
-        ) {
+        if (!updateCustomerDataDto.getAddress().equals(customer.getAddress())) {
             customer.setAddress(updateCustomerDataDto.getAddress());
         }
 
@@ -93,30 +93,44 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCustomerOrder(long customerId, Order order) {
+        ValidationUtils.validateNotNull(order, "order");
+
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+        customer.addOrder(order);
+        customerRepository.save(customer);
+    }
+
+    @Override
     public List<Order> getOrdersByCustomerId(long customerId) {
-        return customerRepository.findById(customerId)
-                .map(customer -> List.copyOf(customer.getOrders()))
-                .orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+        return customerRepository.findById(customerId).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
     }
 
     @Override
     public List<Order> getOrdersByCustomerEmail(String customerEmail) {
-        return customerRepository.findByEmail(customerEmail)
-                .map(customer -> List.copyOf(customer.getOrders()))
-                .orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));    }
+        ValidationUtils.validateNotNull(customerEmail, "customerEmail");
+
+        return customerRepository.findByEmail(customerEmail).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+    }
 
     @Override
     public List<Order> getOrdersByCustomerPhoneNumber(String customerPhone) {
-        return customerRepository.findByPhone(customerPhone)
-                .map(customer -> List.copyOf(customer.getOrders()))
-                .orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));    }
+        ValidationUtils.validateNotNull(customerPhone, "customerPhone");
 
-    private void validateCustomerData(Customer foundCustomer, NewCustomerDto newCustomer) {
+        return customerRepository.findByPhoneNumber(customerPhone).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(OrderExceptionsMessages.CUSTOMER_NOT_FOUND));
+    }
+
+    private void validateCustomerUniqueness(Customer foundCustomer, NewCustomerDto newCustomer) {
         if (foundCustomer.getEmail().equals(newCustomer.getEmail())) {
+            log.error("Not unique email for {}", newCustomer);
             throw new CustomerEmailNotUniqueException(OrderExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE);
         }
         if (foundCustomer.getPhoneNumber().equals(newCustomer.getPhoneNumber())) {
+            log.error("Not unique phone number for {}", newCustomer);
             throw new CustomerPhoneNumberNotUniqueException(OrderExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE);
         }
     }
+
+
 }
