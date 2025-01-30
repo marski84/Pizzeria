@@ -1,30 +1,23 @@
 package org.localhost.pizzeria.messaging.config;
 
-import lombok.Value;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Value
+@Configuration
 public class RabbitMQConfig {
-    String host;
-    int port;
-    String username;
-    String password;
-    String supplyCheckQueue;
-    String supplyCheckExchange;
-    String supplyCheckRoutingKey;
-    String dlqQueue;
-    String dlqExchange;
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 
-    public static RabbitMQConfig getDefaultConfig() {
-        return new RabbitMQConfig(
-                "localhost",
-                5672,
-                "guest",
-                "guest",
-                "supply-check-queue",
-                "supply-check-exchange",
-                "supply-check-routing-key",
-                "supply-check-dlq",
-                "supply-check-dlq-exchange"
-        );
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(jsonMessageConverter());
+        return template;
     }
 }

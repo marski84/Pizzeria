@@ -22,6 +22,8 @@ services:
     image: rabbitmq:3-management
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./src/main/java/org/localhost/pizzeria/messaging/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./src/main/java/org/localhost/pizzeria/messaging/config/definitions.json:/etc/rabbitmq/definitions.json
     container_name: pizzeria-rabbitmq
     ports:
       - "5672:5672"   # AMQP port
