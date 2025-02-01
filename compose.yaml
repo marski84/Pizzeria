@@ -38,7 +38,7 @@ services:
       retries: 3
 
   nats:
-    image: nats:2.10-alpine  # używamy konkretnej wersji
+    image: nats:2.10-alpine
     container_name: pizzeria-nats
     restart: unless-stopped
     ports:

@@ -15,7 +15,6 @@ import lombok.Setter;
 @Builder
 public class EditIngredientDto {
     @NotBlank(message = "Name is mandatory")
-    @Column(unique = true)
     private String productName;
 
     @NotNull(message = "Minimum required amount cannot be null")

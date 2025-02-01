@@ -20,10 +20,12 @@ public class SupplySystemQueryServiceImpl implements SupplySystemQueryService {
     }
 
     @Override
-    public Ingredient isIngredientInStock(Ingredient ingredient) {
-        return supplySystemRepository.findById(ingredient.getId()).orElseThrow(
+    public boolean isIngredientInStock(long ingredientId, long quantity) {
+        Ingredient ingredient = supplySystemRepository.findById(ingredientId).orElseThrow(
                 () -> new IngredientNotFoundException(IngredientExceptionsDetails.INGREDIENT_NOT_FOUND)
         );
+
+        return ingredient.getAmountInStock() > quantity;
     }
 
     @Override
