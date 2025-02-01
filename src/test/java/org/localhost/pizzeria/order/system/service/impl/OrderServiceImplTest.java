@@ -4,24 +4,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.localhost.pizzeria.config.discounts.DiscountCatalogTemplate;
+import org.localhost.pizzeria.config.discounts.DiscountCatalog;
 import org.localhost.pizzeria.config.discounts.DiscountParam;
 import org.localhost.pizzeria.nats.publisher.Publisher;
 import org.localhost.pizzeria.nats.subscriber.Subscriber;
-import org.localhost.pizzeria.order.system.OrderStatus;
-import org.localhost.pizzeria.order.system.dto.NewCustomerDto;
-import org.localhost.pizzeria.order.system.dto.NewOrderDto;
-import org.localhost.pizzeria.order.system.exceptions.NotEnoughIngredientsException;
-import org.localhost.pizzeria.order.system.exceptions.OrderExceptionsMessages;
-import org.localhost.pizzeria.order.system.model.Customer;
-import org.localhost.pizzeria.order.system.model.Order;
-import org.localhost.pizzeria.order.system.model.Pizza;
-import org.localhost.pizzeria.order.system.repository.OrderRepository;
-import org.localhost.pizzeria.order.system.repository.PizzaRepository;
-import org.localhost.pizzeria.order.system.service.CustomerService;
-import org.localhost.pizzeria.order.system.service.OrderPricingService;
-import org.localhost.pizzeria.order.system.service.OrderService;
-import org.localhost.pizzeria.order.system.service.PizzaService;
+import org.localhost.pizzeria.order.system.order.OrderStatus;
+import org.localhost.pizzeria.order.system.customer.service.impl.CustomerServiceImpl;
+import org.localhost.pizzeria.order.system.customer.dto.NewCustomerDto;
+import org.localhost.pizzeria.order.system.order.dto.NewOrderDto;
+import org.localhost.pizzeria.order.system.pizza.exceptions.NotEnoughIngredientsException;
+import org.localhost.pizzeria.order.system.order.exceptions.messages.OrderExceptionsMessages;
+import org.localhost.pizzeria.order.system.customer.model.Customer;
+import org.localhost.pizzeria.order.system.order.model.Order;
+import org.localhost.pizzeria.order.system.pizza.model.Pizza;
+import org.localhost.pizzeria.order.system.order.service.impl.OrderPricingServiceImpl;
+import org.localhost.pizzeria.order.system.order.service.impl.OrderServiceImpl;
+import org.localhost.pizzeria.order.system.order.repository.OrderRepository;
+import org.localhost.pizzeria.order.system.pizza.repository.PizzaRepository;
+import org.localhost.pizzeria.order.system.customer.service.CustomerService;
+import org.localhost.pizzeria.order.system.order.service.OrderPricingService;
+import org.localhost.pizzeria.order.system.order.service.OrderService;
+import org.localhost.pizzeria.order.system.pizza.service.PizzaService;
+import org.localhost.pizzeria.order.system.pizza.service.impl.PizzaServiceImpl;
 import org.localhost.pizzeria.order.system.service.impl.data.IngredientsTestData;
 import org.localhost.pizzeria.order.system.service.impl.data.PizzaMenuTestData;
 import org.localhost.pizzeria.supplies.system.repository.SupplySystemRepository;
@@ -57,26 +61,26 @@ class OrderServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        DiscountCatalogTemplate discountCatalogTemplate = new DiscountCatalogTemplate();
+        DiscountCatalog discountCatalog = new DiscountCatalog();
 
-        discountCatalogTemplate.registerNewDiscount(DiscountParam.builder()
+        discountCatalog.registerNewDiscount(DiscountParam.builder()
                 .discountLevel(new BigDecimal("0.10"))
                 .ageLimit(10)
-                .weekdays(List.of(DayOfWeek.TUESDAY))
+                .weekdays(List.of(DayOfWeek.FRIDAY))
                 .studentStatusRequired(true)
                 .build());
 
-        discountCatalogTemplate.registerNewDiscount(DiscountParam.builder()
+        discountCatalog.registerNewDiscount(DiscountParam.builder()
                 .discountLevel(new BigDecimal("0.40"))
                 .ageLimit(10)
-                .weekdays(List.of(DayOfWeek.TUESDAY))
+                .weekdays(List.of(DayOfWeek.FRIDAY))
                 .studentStatusRequired(true)
                 .build());
 
         messagingTemplate = mock(SimpMessagingTemplate.class);
         orderRepository = new InMemoryOrderRepository();
         pizzaRepository = new InMemoryPizzaRepository();
-        orderPricingService = new OrderPricingServiceImpl(discountCatalogTemplate);
+        orderPricingService = new OrderPricingServiceImpl(discountCatalog);
         supplySystemRepository = new InMemoryIngredientRepository();
         supplySystemCommandService = new SupplySystemCommandServiceImpl(supplySystemRepository);
         supplySystemQueryService = new SupplySystemQueryServiceImpl(supplySystemRepository);

@@ -1,7 +1,7 @@
 package org.localhost.pizzeria.order.system.service.impl;
 
-import org.localhost.pizzeria.order.system.model.Pizza;
-import org.localhost.pizzeria.order.system.repository.PizzaRepository;
+import org.localhost.pizzeria.order.system.pizza.model.Pizza;
+import org.localhost.pizzeria.order.system.pizza.repository.PizzaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +88,5 @@ public class InMemoryPizzaRepository implements PizzaRepository {
 
     @Override
     public void deleteAll() {
-
-    }
-
-    @Override
-    public boolean existsByName(String name) {
-        return pizzaMenu.values().stream().anyMatch(p -> p.getName().equals(name));
     }
 }

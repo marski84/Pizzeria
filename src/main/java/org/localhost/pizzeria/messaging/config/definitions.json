@@ -28,7 +28,10 @@
       "durable": true,
       "auto_delete": false,
       "arguments": {
-        "x-dead-letter-exchange": "supply-check-dlq-exchange"
+        "x-dead-letter-exchange": "supply-check-dlq-exchange",
+        "x-dead-letter-routing-key": "supply-check-dlq-routing-key",
+        "x-message-ttl": 60000,
+        "x-max-retries": 5
       }
     },
     {
@@ -36,7 +39,8 @@
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
-      "arguments": {}
+      "arguments": {
+      }
     }
   ],
   "exchanges": [
@@ -73,7 +77,7 @@
       "vhost": "/",
       "destination": "supply-check-dlq",
       "destination_type": "queue",
-      "routing_key": "",
+      "routing_key": "supply-check-dlq-routing-key",
       "arguments": {}
     }
   ]

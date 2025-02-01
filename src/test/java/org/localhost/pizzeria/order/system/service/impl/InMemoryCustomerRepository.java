@@ -1,7 +1,8 @@
 package org.localhost.pizzeria.order.system.service.impl;
 
-import org.localhost.pizzeria.order.system.model.Customer;
-import org.localhost.pizzeria.order.system.repository.CustomerRepository;
+import org.localhost.pizzeria.order.system.customer.dto.CustomerConflictDto;
+import org.localhost.pizzeria.order.system.customer.model.Customer;
+import org.localhost.pizzeria.order.system.customer.repository.CustomerRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,11 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     @Override
     public boolean existsByPhoneNumber(String phone) {
         return customers.values().stream().anyMatch(customer -> customer.getPhoneNumber().equals(phone));
+    }
+
+    @Override
+    public CustomerConflictDto checkCustomerDataConflicts(Long id, String email, String phoneNumber) {
+        return null;
     }
 
     @Override

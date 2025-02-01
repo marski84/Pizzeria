@@ -3,17 +3,19 @@ package org.localhost.pizzeria.order.system.service.impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.localhost.pizzeria.order.system.OrderStatus;
-import org.localhost.pizzeria.order.system.dto.NewCustomerDto;
-import org.localhost.pizzeria.order.system.dto.UpdateCustomerDataDto;
-import org.localhost.pizzeria.order.system.exceptions.CustomerEmailNotUniqueException;
-import org.localhost.pizzeria.order.system.exceptions.CustomerNotFoundException;
-import org.localhost.pizzeria.order.system.exceptions.CustomerPhoneNumberNotUniqueException;
-import org.localhost.pizzeria.order.system.exceptions.OrderExceptionsMessages;
-import org.localhost.pizzeria.order.system.model.Customer;
-import org.localhost.pizzeria.order.system.model.Order;
-import org.localhost.pizzeria.order.system.repository.CustomerRepository;
-import org.localhost.pizzeria.order.system.service.CustomerService;
+import org.localhost.pizzeria.order.system.customer.exceptions.messages.CustomerExceptionsMessages;
+import org.localhost.pizzeria.order.system.order.OrderStatus;
+import org.localhost.pizzeria.order.system.customer.service.impl.CustomerServiceImpl;
+import org.localhost.pizzeria.order.system.customer.dto.NewCustomerDto;
+import org.localhost.pizzeria.order.system.customer.dto.UpdateCustomerDataDto;
+import org.localhost.pizzeria.order.system.customer.exceptions.CustomerEmailNotUniqueException;
+import org.localhost.pizzeria.order.system.customer.exceptions.CustomerNotFoundException;
+import org.localhost.pizzeria.order.system.customer.exceptions.CustomerPhoneNumberNotUniqueException;
+import org.localhost.pizzeria.order.system.order.exceptions.messages.OrderExceptionsMessages;
+import org.localhost.pizzeria.order.system.customer.model.Customer;
+import org.localhost.pizzeria.order.system.order.model.Order;
+import org.localhost.pizzeria.order.system.customer.repository.CustomerRepository;
+import org.localhost.pizzeria.order.system.customer.service.CustomerService;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -65,7 +67,7 @@ class CustomerServiceImplTest {
 //        when, then
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.findCustomerByEmail(NON_EXISTING_CUSTOMER_EMAIL));
 
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
 
@@ -78,7 +80,7 @@ class CustomerServiceImplTest {
 //        when, then
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.findCustomerByPhoneNumber(NON_EXISTING_CUSTOMER_PHONE_NUMBER));
 
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
     @DisplayName("findCustomerByPhoneNumber should throw when phone number is null")
@@ -111,7 +113,7 @@ class CustomerServiceImplTest {
 //        when, then
         CustomerEmailNotUniqueException testResult = assertThrows(CustomerEmailNotUniqueException.class, () -> objectUnderTest.registerNewCustomer(notUniqueEmailCustomer));
 
-        assertAll(() -> assertEquals(OrderExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE.getErrorCode(), testResult.getErrorCode()), () -> assertEquals(OrderExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE.getErrorMessage(), testResult.getMessage()));
+        assertAll(() -> assertEquals(CustomerExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE.getErrorCode(), testResult.getErrorCode()), () -> assertEquals(CustomerExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE.getErrorMessage(), testResult.getMessage()));
     }
 
     @DisplayName("registerNewCustomer should throw when phone number is not unique")
@@ -123,7 +125,7 @@ class CustomerServiceImplTest {
 //        when, then
         CustomerPhoneNumberNotUniqueException testResult = assertThrows(CustomerPhoneNumberNotUniqueException.class, () -> objectUnderTest.registerNewCustomer(notUniquePhoneNumberCustomer));
 
-        assertAll(() -> assertEquals(OrderExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE.getErrorCode(), testResult.getErrorCode()), () -> assertEquals(OrderExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE.getErrorMessage(), testResult.getMessage()));
+        assertAll(() -> assertEquals(CustomerExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE.getErrorCode(), testResult.getErrorCode()), () -> assertEquals(CustomerExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE.getErrorMessage(), testResult.getMessage()));
     }
 
     @DisplayName("deleteCustomer should successfully delete customer")
@@ -143,7 +145,7 @@ class CustomerServiceImplTest {
         long NON_EXISTING_CUSTOMER_ID = 11L;
 //        when, then
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.deleteCustomer(NON_EXISTING_CUSTOMER_ID));
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
     @DisplayName("updateCustomerData should update customer data")
@@ -163,7 +165,7 @@ class CustomerServiceImplTest {
 //        when, then
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.updateCustomerData(updateCustomerDataDto));
 
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
     @DisplayName("updateCustomerOrder should update customer orders")
@@ -213,7 +215,7 @@ class CustomerServiceImplTest {
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.getOrdersByCustomerId(NON_EXISTING_CUSTOMER_ID));
 
 //        then
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
     @DisplayName("getOrdersByCustomerEmail should return empty list")
@@ -237,7 +239,7 @@ class CustomerServiceImplTest {
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.getOrdersByCustomerEmail(NON_EXISTING_CUSTOMER_EMAIL));
 
 //        then
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 
     @DisplayName("getOrdersByCustomerEmail should return empty list")
@@ -262,6 +264,6 @@ class CustomerServiceImplTest {
         CustomerNotFoundException testResult = assertThrows(CustomerNotFoundException.class, () -> objectUnderTest.getOrdersByCustomerPhoneNumber(NON_EXISTING_CUSTOMER_PHONE));
 
 //        then
-        assertAll(() -> assertEquals(testResult.getMessage(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), OrderExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
+        assertAll(() -> assertEquals(testResult.getMessage(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorMessage()), () -> assertEquals(testResult.getErrorCode(), CustomerExceptionsMessages.CUSTOMER_NOT_FOUND.getErrorCode()));
     }
 }
