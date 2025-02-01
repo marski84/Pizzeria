@@ -1,8 +1,8 @@
 package org.localhost.pizzeria.order.system.service.impl;
 
-import org.localhost.pizzeria.order.system.OrderStatus;
-import org.localhost.pizzeria.order.system.model.Order;
-import org.localhost.pizzeria.order.system.repository.OrderRepository;
+import org.localhost.pizzeria.order.system.order.OrderStatus;
+import org.localhost.pizzeria.order.system.order.model.Order;
+import org.localhost.pizzeria.order.system.order.repository.OrderRepository;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;

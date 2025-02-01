@@ -2,9 +2,9 @@ package org.localhost.pizzeria.supplies.system.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.localhost.pizzeria.messaging.dto.SupplyCheckMessage;
-import org.localhost.pizzeria.messaging.publisher.RabbitMQPublisher;
 import org.localhost.pizzeria.supplies.system.model.Ingredient;
 import org.localhost.pizzeria.supplies.system.service.SupplySystemQueryService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class SupplyCheckScheduler {
     private final SupplySystemQueryService supplySystemQueryService;
-    private final RabbitMQPublisher rabbitMQPublisher;
+    private final RabbitTemplate rabbitTemplate;
 
 
     @Value("${rabbitmq.exchange.supply-check}")
@@ -27,13 +27,13 @@ public class SupplyCheckScheduler {
     private String supplyCheckRoutingKey;
 
 
-    public SupplyCheckScheduler(SupplySystemQueryService supplySystemQueryService, RabbitMQPublisher rabbitMQPublisher) {
+    public SupplyCheckScheduler(SupplySystemQueryService supplySystemQueryService, RabbitTemplate rabbitTemplate) {
         this.supplySystemQueryService = supplySystemQueryService;
-        this.rabbitMQPublisher = rabbitMQPublisher;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-//    @Scheduled(fixedDelayString = "${scheduler.supply-check.interval}")
-    @Scheduled(cron = "* * * * * *")
+    @Scheduled(fixedDelayString = "${scheduler.supply-check.interval}")
+//    @Scheduled(cron = "* * * * * *")
     public void checkSuppliesStatus() {
         log.info("Checking supplies status");
         try {
@@ -44,7 +44,9 @@ public class SupplyCheckScheduler {
             log.info("Number of ingredients to supply: {}", suppliesToOrderList.size());
             if (!suppliesToOrderList.isEmpty()) {
                 SupplyCheckMessage supplyCheckMessage = new SupplyCheckMessage(suppliesToOrderList);
-                rabbitMQPublisher.publishMessage(supplyCheckExchange, supplyCheckRoutingKey, supplyCheckMessage);
+                rabbitTemplate.convertAndSend(supplyCheckExchange, supplyCheckRoutingKey, supplyCheckMessage);
+
+//                rabbitMQPublisher.publishMessage(supplyCheckExchange, supplyCheckRoutingKey, supplyCheckMessage);
                 log.info("Supply check message sent for ingredients: " + suppliesToOrderList.size());
             }
         } catch (Exception e) {

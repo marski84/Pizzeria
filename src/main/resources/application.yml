@@ -10,10 +10,8 @@ spring:
 rabbitmq:
   queue:
     supply-check: supply-check-queue
-    supply-check-dlq: supply-check-dlq
   exchange:
     supply-check: supply-check-exchange
-    supply-check-dlq-exchange: supply-check-dlq-exchange
   routing-key:
     supply-check: supply-check-routing-key
 

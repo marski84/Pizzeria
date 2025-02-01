@@ -11,8 +11,8 @@ import java.util.List;
 public class DiscountConfiguration {
 
     @Bean
-    public DiscountCatalogTemplate discountCatalog() {
-        DiscountCatalogTemplate discountCatalog = new DiscountCatalogTemplate();
+    public DiscountCatalog discountCatalog() {
+        DiscountCatalog discountCatalog = new DiscountCatalog();
 
         discountCatalog.registerNewDiscount(DiscountParam.builder()
                 .discountLevel(new BigDecimal("0.1"))

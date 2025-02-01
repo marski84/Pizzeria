@@ -2,6 +2,9 @@ CREATE SCHEMA IF NOT EXISTS supply_system;
 CREATE SCHEMA IF NOT EXISTS inventory;
 CREATE SCHEMA IF NOT EXISTS ordering_system;
 
+CREATE TYPE ordering_system.order_status_enum AS ENUM ('NEW', 'PROCESSING', 'FINALIZED');
+
+
 CREATE TABLE IF NOT EXISTS supply_system.ingredients
 (
     id                      BIGSERIAL PRIMARY KEY,
@@ -35,32 +38,33 @@ CREATE TABLE IF NOT EXISTS ordering_system.customers
     id           BIGSERIAL PRIMARY KEY,
     first_name   VARCHAR(255) NOT NULL,
     last_name    VARCHAR(255) NOT NULL,
+    age          integer      not null,
+    is_Student   boolean default false,
     address      VARCHAR(255) NOT NULL,
     email        VARCHAR(255) NOT NULL UNIQUE,
-    phone_number VARCHAR(20)  NOT NULL UNIQUE,
-    CONSTRAINT customer_email_unique UNIQUE (email),
-    CONSTRAINT customer_phone_unique UNIQUE (phone_number)
+    phone_number VARCHAR(20)  NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS ordering_system.orders
 (
     id                    BIGSERIAL PRIMARY KEY,
-    order_received_date   TIMESTAMP WITH TIME ZONE NOT NULL,
+    order_received_date   TIMESTAMP WITH TIME ZONE          NOT NULL,
     order_processing_date TIMESTAMP WITH TIME ZONE,
     order_finalized_date  TIMESTAMP WITH TIME ZONE,
-    order_status          VARCHAR(20)              NOT NULL CHECK (order_status IN ('NEW', 'PROCESSING', 'FINALIZED')),
-    customer_id           BIGINT                   NOT NULL,
+    order_value           numeric(10, 2)                    NOT NULL,
+    order_status          ordering_system.order_status_enum NOT NULL,
+    customer_id           BIGINT                            NOT NULL,
     CONSTRAINT fk_customer
         FOREIGN KEY (customer_id)
             REFERENCES customers (id)
-            ON DELETE RESTRICT
+            ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS ordering_system.pizzas
 (
     id         BIGSERIAL PRIMARY KEY,
-    name       VARCHAR(255) NOT NULL,
-    price      numeric(10,2) NOT NULL,
+    name       VARCHAR(255)   NOT NULL UNIQUE,
+    price      numeric(10, 2) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE,
     updated_at TIMESTAMP WITH TIME ZONE,
     CONSTRAINT uk_pizza_name UNIQUE (name)

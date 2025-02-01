@@ -1,7 +1,7 @@
 package org.localhost.pizzeria.order.system.service.impl.data;
 
-import org.localhost.pizzeria.order.system.dto.NewPizzaDto;
-import org.localhost.pizzeria.order.system.model.PizzaIngredient;
+import org.localhost.pizzeria.order.system.pizza.dto.NewPizzaDto;
+import org.localhost.pizzeria.order.system.pizza.model.PizzaIngredient;
 
 import java.math.BigDecimal;
 import java.util.List;

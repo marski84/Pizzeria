@@ -3,14 +3,15 @@ package org.localhost.pizzeria.order.system.service.impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.localhost.pizzeria.order.system.dto.NewPizzaDto;
-import org.localhost.pizzeria.order.system.exceptions.OrderExceptionsMessages;
-import org.localhost.pizzeria.order.system.exceptions.PizzaAlreadyAddedException;
-import org.localhost.pizzeria.order.system.exceptions.PizzaNotFoundException;
-import org.localhost.pizzeria.order.system.model.Pizza;
-import org.localhost.pizzeria.order.system.model.PizzaIngredient;
-import org.localhost.pizzeria.order.system.repository.PizzaRepository;
-import org.localhost.pizzeria.order.system.service.PizzaService;
+import org.localhost.pizzeria.order.system.pizza.dto.NewPizzaDto;
+import org.localhost.pizzeria.order.system.order.exceptions.messages.OrderExceptionsMessages;
+import org.localhost.pizzeria.order.system.pizza.exceptions.PizzaAlreadyAddedException;
+import org.localhost.pizzeria.order.system.pizza.exceptions.PizzaNotFoundException;
+import org.localhost.pizzeria.order.system.pizza.model.Pizza;
+import org.localhost.pizzeria.order.system.pizza.model.PizzaIngredient;
+import org.localhost.pizzeria.order.system.pizza.repository.PizzaRepository;
+import org.localhost.pizzeria.order.system.pizza.service.PizzaService;
+import org.localhost.pizzeria.order.system.pizza.service.impl.PizzaServiceImpl;
 
 import java.util.List;
 
