@@ -9,19 +9,16 @@ import org.localhost.pizzeria.config.discounts.DiscountParam;
 import org.localhost.pizzeria.nats.publisher.Publisher;
 import org.localhost.pizzeria.nats.subscriber.Subscriber;
 import org.localhost.pizzeria.order.system.order.OrderStatus;
-import org.localhost.pizzeria.order.system.customer.service.impl.CustomerServiceImpl;
 import org.localhost.pizzeria.order.system.customer.dto.NewCustomerDto;
 import org.localhost.pizzeria.order.system.order.dto.NewOrderDto;
 import org.localhost.pizzeria.order.system.pizza.exceptions.NotEnoughIngredientsException;
 import org.localhost.pizzeria.order.system.order.exceptions.messages.OrderExceptionsMessages;
-import org.localhost.pizzeria.order.system.customer.model.Customer;
 import org.localhost.pizzeria.order.system.order.model.Order;
 import org.localhost.pizzeria.order.system.pizza.model.Pizza;
 import org.localhost.pizzeria.order.system.order.service.impl.OrderPricingServiceImpl;
 import org.localhost.pizzeria.order.system.order.service.impl.OrderServiceImpl;
 import org.localhost.pizzeria.order.system.order.repository.OrderRepository;
 import org.localhost.pizzeria.order.system.pizza.repository.PizzaRepository;
-import org.localhost.pizzeria.order.system.customer.service.CustomerService;
 import org.localhost.pizzeria.order.system.order.service.OrderPricingService;
 import org.localhost.pizzeria.order.system.order.service.OrderService;
 import org.localhost.pizzeria.order.system.pizza.service.PizzaService;
@@ -55,9 +52,11 @@ class OrderServiceImplTest {
     private SupplySystemCommandService supplySystemCommandService;
     private PizzaService pizzaService;
     private SimpMessagingTemplate messagingTemplate;
-    CustomerService customerService;
     Subscriber subscribe;
     Publisher publisher;
+
+    private final long CUSTOMER_ID = 1;
+
 
     @BeforeEach
     void setUp() {
@@ -85,8 +84,7 @@ class OrderServiceImplTest {
         supplySystemCommandService = new SupplySystemCommandServiceImpl(supplySystemRepository);
         supplySystemQueryService = new SupplySystemQueryServiceImpl(supplySystemRepository);
         pizzaService = new PizzaServiceImpl(pizzaRepository);
-        customerService = new CustomerServiceImpl(new InMemoryCustomerRepository());
-        objectUnderTest = new OrderServiceImpl(messagingTemplate, orderRepository, pizzaService, customerService, orderPricingService, supplySystemQueryService, supplySystemCommandService, subscribe, publisher);
+        objectUnderTest = new OrderServiceImpl(orderRepository, pizzaService, supplySystemQueryService, supplySystemCommandService );
 
         supplySystemRepository.saveAll(IngredientsTestData.getAllIngredients());
         PizzaMenuTestData.getAllPizzas().forEach(pizzaService::addPizzaToMenu);
@@ -106,14 +104,12 @@ class OrderServiceImplTest {
 
 
         NewCustomerDto newCustomerDto = NewCustomerDto.builder().firstName("testCustom").lastName("test last name").age(9).isStudent(true).address("test adress").email("test email").phoneNumber("+48999888777").build();
-        Customer customer = customerService.registerNewCustomer(newCustomerDto);
-        NewOrderDto newOrderDto = NewOrderDto.builder().customer(customer).pizzaIdList(selectedPizzasIds).build();
+        NewOrderDto newOrderDto = NewOrderDto.builder().customerId(CUSTOMER_ID).pizzaIdList(selectedPizzasIds).build();
 //        when
         Order testResult = objectUnderTest.createOrder(newOrderDto);
         //        then
         assertAll(
-                () -> assertEquals(customer.getId(), testResult.getCustomer().getId()),
-                () -> assertEquals(customer.getOrders(), testResult.getCustomer().getOrders()),
+                () -> assertEquals(CUSTOMER_ID, testResult.getCustomerId()),
                 () -> assertEquals(firstSelecetedPizza.getId(), testResult.getPizzaIds().get(0)),
                 () -> assertEquals(secondSelecetedPizza.getId(), testResult.getPizzaIds().get(1)),
                 () -> assertEquals(totalPrice, testResult.getOrderValue()),
@@ -134,9 +130,8 @@ class OrderServiceImplTest {
         supplySystemCommandService.decreaseIngredientStock(firstSelecetedPizza.getIngredients().get(0).getIngredientId(), FLOUR_BELOW_MINIMUM_INGREDIENTS_AMOUNT_MODIFIER);
 
         NewCustomerDto newCustomerDto = NewCustomerDto.builder().firstName("testCustom").lastName("test last name").address("test adress").email("test email").phoneNumber("+48999888777").build();
-        Customer customer = customerService.registerNewCustomer(newCustomerDto);
 
-        NewOrderDto newOrderDto = NewOrderDto.builder().customer(customer).pizzaIdList(selectedPizzasIds).build();
+        NewOrderDto newOrderDto = NewOrderDto.builder().customerId(CUSTOMER_ID).pizzaIdList(selectedPizzasIds).build();
 //        when
         NotEnoughIngredientsException testResult = assertThrows(
                 NotEnoughIngredientsException.class,

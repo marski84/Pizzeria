@@ -5,17 +5,14 @@ import org.localhost.pizzeria.order.system.customer.dto.CustomerConflictDto;
 import org.localhost.pizzeria.order.system.customer.dto.NewCustomerDto;
 import org.localhost.pizzeria.order.system.customer.dto.UpdateCustomerDataDto;
 import org.localhost.pizzeria.order.system.customer.exceptions.CustomerEmailNotUniqueException;
-import org.localhost.pizzeria.order.system.customer.exceptions.CustomerNotFoundException;
 import org.localhost.pizzeria.order.system.customer.exceptions.CustomerPhoneNumberNotUniqueException;
 import org.localhost.pizzeria.order.system.customer.exceptions.messages.CustomerExceptionsMessages;
 import org.localhost.pizzeria.order.system.customer.model.Customer;
-import org.localhost.pizzeria.order.system.order.model.Order;
 import org.localhost.pizzeria.order.system.customer.repository.CustomerRepository;
 import org.localhost.pizzeria.order.system.customer.service.CustomerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
 @Slf4j
@@ -26,21 +23,32 @@ public class CustomerServiceImpl implements CustomerService {
         this.customerRepository = customerRepository;
     }
 
+
     @Override
     public Customer findCustomerByEmail(String email) {
-        return customerRepository.findByEmail(email).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
+        return customerRepository.findByEmail(email);
     }
 
     @Override
     public Customer findCustomerByPhoneNumber(String phoneNumber) {
-        return customerRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
+        return customerRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public Customer findCustomerById(Long id) {
+        return customerRepository.findById(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer registerNewCustomer(NewCustomerDto customer) {
-        customerRepository.findByEmailOrPhoneNumber(customer.getEmail(), customer.getPhoneNumber()).ifPresent(foundCustomer -> validateCustomerUniqueness(foundCustomer, customer));
-
+        CustomerConflictDto customerConflictDto = customerRepository.checkCustomerDataConflicts(customer.getEmail(), customer.getPhoneNumber());
+        if (customerConflictDto.emailConflict()) {
+            throw new CustomerEmailNotUniqueException(CustomerExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE);
+        }
+        if (customerConflictDto.phoneNumberConflict()) {
+            throw new CustomerPhoneNumberNotUniqueException(CustomerExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE);
+        }
         Customer newCustomer = Customer.fromNewCustomerDto(customer);
         log.info("New customer registered with id: {}", newCustomer.getId());
 
@@ -50,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long deleteCustomer(long customerId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findById(customerId);
         customerRepository.delete(customer);
         return customer.getId();
     }
@@ -58,19 +66,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer updateCustomerData(UpdateCustomerDataDto updateCustomerDataDto) {
-        Customer customer = customerRepository.findById(updateCustomerDataDto.getId())
-                .orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
-
+        Customer customer = customerRepository.findById(updateCustomerDataDto.getId());
         CustomerConflictDto conflicts = customerRepository.checkCustomerDataConflicts(
-                customer.getId(),
                 updateCustomerDataDto.getEmail(),
                 updateCustomerDataDto.getPhoneNumber()
         );
 
-        if (conflicts.isEmailConflict()) {
+        if (conflicts.emailConflict()) {
             throw new CustomerEmailNotUniqueException(CustomerExceptionsMessages.CUSTOMER_EMAIL_NOT_UNIQUE);
         }
-        if (conflicts.isPhoneNumberConflict()) {
+        if (conflicts.phoneNumberConflict()) {
             throw new CustomerPhoneNumberNotUniqueException(CustomerExceptionsMessages.CUSTOMER_PHONE_NUMBER_NOT_UNIQUE);
         }
 
@@ -81,28 +86,13 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCustomerOrder(long customerId, Order order) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
-        customer.addOrder(order);
-        customerRepository.save(customer);
-    }
-
-    @Override
-    public List<Order> getOrdersByCustomerId(long customerId) {
-        return customerRepository.findById(customerId).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
-    }
-
-    @Override
-    public List<Order> getOrdersByCustomerEmail(String customerEmail) {
-        return customerRepository.findByEmail(customerEmail).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
-    }
-
-    @Override
-    public List<Order> getOrdersByCustomerPhoneNumber(String customerPhone) {
-        return customerRepository.findByPhoneNumber(customerPhone).map(customer -> List.copyOf(customer.getOrders())).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
-    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public void updateCustomerOrder(long customerId, Order order) {
+//        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(CustomerExceptionsMessages.CUSTOMER_NOT_FOUND));
+//        customer.addOrder(order);
+//        customerRepository.save(customer);
+//    }
 
     private void validateCustomerUniqueness(Customer foundCustomer, NewCustomerDto newCustomer) {
         if (foundCustomer.getEmail().equals(newCustomer.getEmail())) {

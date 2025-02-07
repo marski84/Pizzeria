@@ -1,12 +1,11 @@
 package org.localhost.pizzeria.order.system.order.exceptions;
 
-import lombok.Getter;
 import org.localhost.pizzeria.order.system.order.exceptions.messages.OrderExceptionsMessages;
 
-@Getter
-public class OrderNotFoundException extends RuntimeException {
+public class OrderAlreadyProcessedException extends RuntimeException {
     private final int errorCode;
-    public OrderNotFoundException(OrderExceptionsMessages orderExceptionsMessages) {
+
+    public OrderAlreadyProcessedException(OrderExceptionsMessages orderExceptionsMessages) {
         super(orderExceptionsMessages.getErrorMessage());
         this.errorCode = orderExceptionsMessages.getErrorCode();
     }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.localhost.pizzeria.order.system.order.OrderStatus;
-import org.localhost.pizzeria.order.system.customer.model.Customer;
 import org.localhost.pizzeria.order.system.order.dto.NewOrderDto;
 
 import java.math.BigDecimal;
@@ -37,11 +36,21 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Order status cannot be null")
+
     private OrderStatus orderStatus;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @NotNull
+    private Long customerId;
+
+    public void markAsFinalized() {
+        this.orderProcessingDate = ZonedDateTime.now();
+        this.orderStatus = OrderStatus.FINALIZED;
+    }
+
+    public void markAsProcessing() {
+        this.orderProcessingDate = ZonedDateTime.now();
+        this.orderStatus = OrderStatus.PROCESSING;
+    }
 
 
     @ElementCollection
@@ -51,7 +60,7 @@ public class Order {
             joinColumns = @JoinColumn(name = "order_id")
     )
     @Column(name = "pizza_id")
-    private List<Long> pizzaIds = new ArrayList<>();
+    private List<Long>  pizzaIds = new ArrayList<>();
 
 
     public void addPizzaToPizzaList(long pizzaId) {
@@ -79,8 +88,9 @@ public class Order {
 
     public static Order fromNewOrderDto(NewOrderDto newOrderDto) {
         return Order.builder()
-                .customer(newOrderDto.getCustomer())
+                .customerId(newOrderDto.getCustomerId())
                 .orderValue(newOrderDto.getTotalPrice())
+                .orderStatus(OrderStatus.NEW)
                 .pizzaIds(newOrderDto.getPizzaIdList())
                 .build();
     }

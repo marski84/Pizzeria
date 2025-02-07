@@ -50,8 +50,14 @@ public class Customer {
     @NotNull
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<Order> orders = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(
+            name = "customer_orders",
+            joinColumns = @JoinColumn(name = "customer_id")
+    )
+    @Column(name = "order_id")
+    private List<Long> orders = new ArrayList<>();
+
 
     @Builder
     public Customer(Long id, String firstName, String lastName, int age, boolean isStudent,
@@ -67,12 +73,12 @@ public class Customer {
         this.orders = new ArrayList<>();
     }
     public void addOrder(Order order) {
-        orders.add(order);
+        orders.add(order.getId());
     }
 
     public void removeOrder(Order order) {
         if (orders.contains(order) && order.getOrderStatus() == OrderStatus.NEW) {
-            orders.remove(order);
+            orders.remove(order.getId());
         }
     }
 

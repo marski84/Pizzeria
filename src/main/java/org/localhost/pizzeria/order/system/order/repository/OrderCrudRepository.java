@@ -1,13 +1,9 @@
 package org.localhost.pizzeria.order.system.order.repository;
-
 import org.localhost.pizzeria.order.system.order.model.Order;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 
 @Repository
-public interface OrderRepository {
-    Order save(Order newOrder);
-    void deleteOrder(Long id);
-    Order findById(Long id);
+public interface OrderCrudRepository extends CrudRepository<Order, Long> {
 }

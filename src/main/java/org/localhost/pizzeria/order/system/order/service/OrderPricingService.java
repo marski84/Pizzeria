@@ -9,5 +9,5 @@ import java.util.List;
 
 @Service
 public interface OrderPricingService {
-    BigDecimal calculateOrderPrice(List<Pizza> orderedPizzaList, Customer customer);
+    BigDecimal calculateOrderPrice(List<BigDecimal> orderedPriceList, Customer customer);
 }

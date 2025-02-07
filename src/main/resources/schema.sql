@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS supply_system;
 CREATE SCHEMA IF NOT EXISTS inventory;
 CREATE SCHEMA IF NOT EXISTS ordering_system;
-
+DROP TYPE IF EXISTS ordering_system.order_status_enum CASCADE;
 CREATE TYPE ordering_system.order_status_enum AS ENUM ('NEW', 'PROCESSING', 'FINALIZED');
 
 

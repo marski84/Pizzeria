@@ -22,16 +22,15 @@ public class OrderPricingServiceImpl implements OrderPricingService {
     }
 
     @Override
-    public BigDecimal calculateOrderPrice(List<Pizza> orderedPizzaList, Customer customer) {
-        BigDecimal priceBeforeDiscount = calculateBasePrice(orderedPizzaList);
+    public BigDecimal calculateOrderPrice(List<BigDecimal> orderPriceList, Customer customer) {
+        BigDecimal priceBeforeDiscount = calculateBasePrice(orderPriceList);
         BigDecimal priceAfterDiscount = applyDiscounts(priceBeforeDiscount, customer);
         
         return priceBeforeDiscount;
     }
 
-    private BigDecimal calculateBasePrice(List<Pizza> orderedPizzaList) {
+    private BigDecimal calculateBasePrice(List<BigDecimal> orderedPizzaList) {
         BigDecimal totalPrice = orderedPizzaList.stream()
-                .map(Pizza::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return totalPrice;
     }
